@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+    <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+</head>
+
+<body>
+    <ion-app>
+        <!--  SECTOR DE ROOTEO (permitirme pasar de una pantalla a otra) -->
+
+        <ion-router id="router">
+            <ion-route url="/" component="page-home"></ion-route>
+            <ion-route url="/login" component="page-login"></ion-route>
+            <ion-route url="/registrarU" component="page-registrarU"></ion-route>
+            <ion-route url="/listado" component="page-listado"></ion-route>
+            <ion-route url="/rendimiento" component="page-rendimiento"></ion-route>
+            <ion-route url="/estadistica" component="page-estadistica"></ion-route>
+            <ion-route url="/mapa" component="page-mapa"></ion-route>
+        </ion-router>
+        <ion-nav></ion-nav>
+
+
+        <!-- SECTOR DE MENU PRINCIPAL () -->
+
+        <ion-menu content-id="main-content" id="menu">
+            <ion-header>
+                <ion-toolbar color="dark">
+                    <ion-title>Elija la opcion</ion-title>
+                    <!-- aca deberian aparecer las diferentes opciones que estan en el obsidian: Registrar usuario, login, logout, etc -->
+                </ion-toolbar>
+            </ion-header>
+            <ion-content class="ion-padding">
+                <ion-item href="/registrarU" id="btnMenuRegistrarUsuario" onclick="cerrarMenu()">
+                    <ion-label>Registrar Usuario...</ion-label>
+                </ion-item>
+                <ion-item href="/login" id="btnMenuLogin" onclick="cerrarMenu()">
+                    <ion-label>Login...</ion-label>
+                </ion-item>
+
+
+                <ion-item href="/listado" id="btnMenuListado" onclick="cerrarMenu()">
+                    <ion-label>Listado...</ion-label>
+                </ion-item>
+
+                <ion-item href="/" id="btnMenuLogout" onclick="cerrarMenu()">
+                    <ion-label>Logout...</ion-label>
+                </ion-item>
+
+
+                <!-- IMPLEMENTAR LOS CAMBIOS A LO DE ABAJO -->
+
+                <ion-item href="/rendimiento" id="btnMenuRegistrarRendimiento" onclick="cerrarMenu()">
+                    <ion-label>Registrar Rendimiento...</ion-label>
+                </ion-item>
+
+                <ion-item href="/estadistica" id="btnMenuEstadistica" onclick="cerrarMenu()">
+                    <ion-label>Estadística...</ion-label>
+                </ion-item>
+
+                <ion-item href="/mapa" id="btnMenuMapa" onclick="cerrarMenu()">
+                    <ion-label>Mapa...</ion-label>
+                </ion-item>
+
+            </ion-content>
+        </ion-menu>
+
+        <div class="ion-page" id="main-content">
+
+            <!-- SECTOR DE PANTALLAS (CADA UNA DE LAS PANTALLAS QUE VA A TENER MI APLICACION EN FORMATO ION PAGE. UNA PAGINA POR CADA COSA(LOGIN, ETC)) -->
+
+            <!-- Pantalla principal -->
+            <page-home class="ion-page" id="pantalla-home">
+
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>World Cup Fan</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+                    <h2 id="lblBienvenida">Bienvenido al sitio de World Cup Fan</h2>
+                </ion-content>
+            </page-home>
+
+            <!-- Pantalla Login -->
+            <page-login class="ion-page" id="pantalla-login">
+
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>World Cup Fan</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+                    <ion-item>
+                        <ion-input label="Usuario:" id="txtUsuarioLogin"></ion-input>
+                    </ion-item>
+                    <ion-item>
+                        <ion-input label="Contraseña:" id="txtPasswordLogin" type="password"></ion-input>
+                    </ion-item>
+                    <ion-button id="btnLogin">Login</ion-button>
+                    <!-- lugar para mostrar mensajes -->
+                    <ion-text id="lblMensajeLogin"></ion-text>
+                </ion-content>
+
+
+            </page-login>
+
+            <!-- Pantalla Registrar Usuario -->
+            <page-registrarU class="ion-page" id="pantalla-registrarU">
+
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>World Cup Fan</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+
+                    <ion-item>
+                        <ion-input label="Usuario" id="txtUsuarioRegistro"></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-input label="Contraseña" id="txtPasswordRegistro" type="password">
+                        </ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-select label="País" id="slcPais">
+                        </ion-select>
+                    </ion-item>
+
+                    <ion-button id="btnRegistrar">
+                        Registrar
+                    </ion-button>
+                    <!-- lugar para mostrar mensajes -->
+                    <ion-text id="lblMensajeRegistro"></ion-text>
+
+                </ion-content>
+            </page-registrarU>
+
+            <!-- Pantalla Listado -->
+            <page-listado class="ion-page" id="pantalla-listado">
+
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>World Cup Fan</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+                    Listado
+                </ion-content>
+            </page-listado>
+
+            <!-- Pantalla Rendimiento -->
+            <page-rendimiento class="ion-page" id="pantalla-rendimiento">
+
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>World Cup Fan</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+                    Rendimiento
+                </ion-content>
+            </page-rendimiento>
+
+            <!-- Pantalla Estadistica -->
+            <page-estadistica class="ion-page" id="pantalla-estadistica">
+
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>World Cup Fan</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+                    Estadistica
+                </ion-content>
+            </page-estadistica>
+
+            <!-- Pantalla Mapa -->
+            <page-mapa class="ion-page" id="pantalla-mapa">
+
+                <ion-header>
+                    <ion-toolbar>
+                        <ion-buttons slot="start">
+                            <ion-menu-button></ion-menu-button>
+                        </ion-buttons>
+                        <ion-title>World Cup Fan</ion-title>
+                    </ion-toolbar>
+                </ion-header>
+                <ion-content class="ion-padding">
+                    Mapa
+                </ion-content>
+            </page-mapa>
+        </div>
+    </ion-app>
+
+
+    <script src="obligatorio.js"></script>
+</body>
+
+</html>

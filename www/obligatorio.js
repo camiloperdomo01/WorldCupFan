@@ -21,7 +21,7 @@ inicio();
 
 function inicio() {
 
-    // obtenerPaises();
+    obtenerPaises();
 
 
     // cuando el usuario vuelva a abrir la aplicación, ya entra como logueado.
@@ -61,10 +61,6 @@ function navegar(evento) {
     if (evento.detail.to == "/registrarU") {
         pantallaRegistrarU.style.display = "block";
 
-        if (listaPaises.length == 0) {
-            // Se pone aca asi los países se cargan cuando realmente se necesitan y se evita hacer una petición al iniciar la aplicación si el usuario nunca va a registrarse
-            obtenerPaises(); // Cada vez que el usuario entra a la pantalla de registro se llama a obtenerPaises
-        }
     }
 
     if (evento.detail.to == "/listado") {
@@ -126,7 +122,7 @@ function cerrarMenu() {
 
 // Levantar la informacion y armarme lo necesario para que despues ejecute la peticion con exito
 
-//Funcion que va a capturar los datos y se va a armar el objeto
+//esto va a capturar los datos y se va a armar el objeto
 function previaHacerLogin() {
     const usuario = document.querySelector("#txtUsuarioLogin").value;
     const password = document.querySelector("#txtPasswordLogin").value;
@@ -156,7 +152,7 @@ function hacerLogin(usuarioLogin) {
             return response.json()
         })
         .then(function (informacion) {
-            if (informacion.codigo == 200) {
+            if (informacion.codigo >= 200 && informacion.codigo < 300) {
 
                 ocultarTodasPantallas();
 
@@ -246,7 +242,8 @@ function cargarPaises() {
 
 }
 
-// Cuando el usuario toca el botón Registrar los datos se captura el registro. Se ingresará usuario, contraseña y país de residencia
+// Cuando el usuario toca el botón Registrar los datos se capturan en el registro
+// Se ingresa usuario, contraseña y país de residencia
 
 function previaRegistrarUsuario() {
 
@@ -266,7 +263,7 @@ function previaRegistrarUsuario() {
 
 }
 
-// hacer el POST y enviar el registro suponiendo que el endpoint sea /usuarios
+// hacer el POST y enviar el registro al endpoint /usuarios
 
 function registrarUsuario(nuevoUsuario) {
 
@@ -284,13 +281,15 @@ function registrarUsuario(nuevoUsuario) {
 
             console.log(informacion);
 
-            // auto-login.
-
-            if (informacion.codigo == 200) {
+            if (informacion.codigo >= 200 && informacion.codigo < 300) {
 
                 // guardar token
                 localStorage.setItem("token", informacion.token);
-                localStorage.setItem("usuario", nuevoUsuario.usuario); // NO OBLIGATORIO
+                localStorage.setItem("usuario", nuevoUsuario.usuario);
+
+
+                mostrarBienvenida(); // no obligatorio
+
 
                 // cambiar menú
                 mostrarMenuVip();
@@ -302,22 +301,73 @@ function registrarUsuario(nuevoUsuario) {
                 // limpiar mensaje
                 document.querySelector("#lblMensajeRegistro").innerHTML = "";
 
+                // Toast de éxito
+                mostrarMensaje(
+                    "SUCCESS",
+                    "Registro exitoso",
+                    "El usuario fue registrado correctamente."
+                );
+
             }
             else {
 
+                // Mostrar el error en la interfaz (esto lo voy a borrar despues dale)
                 document.querySelector("#lblMensajeRegistro").innerHTML =
                     informacion.mensaje;
+
+                // Toast de error
+                mostrarMensaje(
+                    "ERROR",
+                    "Error",
+                    informacion.mensaje
+                );
 
             }
 
         })
         .catch(function (error) {
+
             console.log(error);
+
+            mostrarMensaje(
+                "ERROR",
+                "Error de conexion",
+                "No fue posible comunicarse con el servidor."
+            );
+
         });
 
 }
 
+function mostrarMensaje(tipo, titulo, texto, duracion) {
 
+    const toast = document.createElement("ion-toast");
+
+    toast.header = titulo;
+    toast.message = texto;
+
+    if (!duracion) {
+        duracion = 2000;
+    }
+
+    toast.duration = duracion;
+
+    if (tipo === "ERROR") {
+        toast.color = "danger";
+        toast.icon = "alert-circle-outline";
+    }
+    else if (tipo === "WARNING") {
+        toast.color = "warning";
+        toast.icon = "warning-outline";
+    }
+    else if (tipo === "SUCCESS") {
+        toast.color = "success";
+        toast.icon = "checkmark-circle-outline";
+    }
+
+    document.body.appendChild(toast);
+    toast.present();
+}
 
 // NO OBLIGATORIO
 

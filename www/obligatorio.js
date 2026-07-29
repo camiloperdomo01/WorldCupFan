@@ -7,7 +7,7 @@ const pantallaHome = document.querySelector("#pantalla-home");
 const pantallaLogin = document.querySelector("#pantalla-login");
 const pantallaRegistrarU = document.querySelector("#pantalla-registrarU");
 const pantallaListado = document.querySelector("#pantalla-listado");
-const pantallaRendimiento = document.querySelector("#pantalla-rendimiento");
+const pantallaRegistrarJugadores = document.querySelector("#pantalla-registrarJugadores");
 const pantallaEstadistica = document.querySelector("#pantalla-estadistica");
 const pantallaMapa = document.querySelector("#pantalla-mapa");
 
@@ -16,6 +16,9 @@ const urlBase = "https://worldcupfan.develotion.com";
 
 //lista para guardar los países
 let listaPaises = [];
+
+let listaPosiciones = [];
+let listaSelecciones = [];
 
 inicio();
 
@@ -45,6 +48,7 @@ function inicio() {
     document.querySelector("#btnLogin").addEventListener("click", previaHacerLogin);
     document.querySelector("#btnMenuLogout").addEventListener("click", hacerLogout);
     document.querySelector("#btnRegistrar").addEventListener("click", previaRegistrarUsuario);
+    document.querySelector("#btnRegistrarJugador").addEventListener("click", previaAnalizarSentimiento);
 }
 
 function navegar(evento) {
@@ -67,8 +71,8 @@ function navegar(evento) {
         pantallaListado.style.display = "block";
     }
 
-    if (evento.detail.to == "/rendimiento") {
-        pantallaRendimiento.style.display = "block";
+    if (evento.detail.to == "/registrarJugadores") {
+        pantallaRegistrarJugadores.style.display = "block";
     }
 
     if (evento.detail.to == "/estadistica") {
@@ -86,7 +90,7 @@ function ocultarTodasPantallas() {
     pantallaLogin.style.display = "none";
     pantallaRegistrarU.style.display = "none";
     pantallaListado.style.display = "none";
-    pantallaRendimiento.style.display = "none";
+    pantallaRegistrarJugadores.style.display = "none";
     pantallaEstadistica.style.display = "none";
     pantallaMapa.style.display = "none";
 }
@@ -96,7 +100,7 @@ function ocultarTodoMenu() {
     document.querySelector("#btnMenuLogin").style.display = "none";
     document.querySelector("#btnMenuLogout").style.display = "none";
     document.querySelector("#btnMenuListado").style.display = "none";
-    document.querySelector("#btnMenuRegistrarRendimiento").style.display = "none";
+    document.querySelector("#btnMenuRegistrarJugadores").style.display = "none";
     document.querySelector("#btnMenuEstadistica").style.display = "none";
     document.querySelector("#btnMenuMapa").style.display = "none";
 }
@@ -111,9 +115,12 @@ function mostrarMenuVip() {
     ocultarTodoMenu();
     document.querySelector("#btnMenuLogout").style.display = "block";
     document.querySelector("#btnMenuListado").style.display = "block";
-    document.querySelector("#btnMenuRegistrarRendimiento").style.display = "block";
+    document.querySelector("#btnMenuRegistrarJugadores").style.display = "block";
     document.querySelector("#btnMenuEstadistica").style.display = "block";
     document.querySelector("#btnMenuMapa").style.display = "block";
+
+    obtenerPosiciones();
+    obtenerSelecciones();
 }
 
 function cerrarMenu() {
@@ -154,19 +161,22 @@ function hacerLogin(usuarioLogin) {
         .then(function (informacion) {
             if (informacion.codigo >= 200 && informacion.codigo < 300) {
 
-                ocultarTodasPantallas();
 
-                pantallaHome.style.display = "block";
 
-                mostrarMenuVip();
 
                 localStorage.setItem("token", informacion.token);
                 localStorage.setItem("usuario", usuarioLogin.usuario); // NO OBLIGATORIO
 
-                mostrarBienvenida(); // NO OBLIGATORIO
+                mostrarMenuVip();
+
+
+
+                ocultarTodasPantallas();
+                pantallaHome.style.display = "block";
 
                 document.querySelector("#lblMensajeLogin").innerHTML = "";
 
+                mostrarBienvenida(); // NO OBLIGATORIO
             }
             else {
                 // agregue un caso de error
@@ -367,6 +377,237 @@ function mostrarMensaje(tipo, titulo, texto, duracion) {
 
     document.body.appendChild(toast);
     toast.present();
+}
+
+//  ---------------------------------------------------- REGISTRAR JUGADORES ----------------------------------------------------
+
+// Obtiene las posiciones disponibles desde la API
+
+function obtenerPosiciones() {
+
+    fetch(`${urlBase}/posiciones`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}` // esto envia el token del usuario logueado
+        }
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (informacion) {
+
+            console.log(informacion);
+
+            listaPosiciones = informacion.posiciones; // guarda las posiciones recibidas
+
+            cargarPosiciones(); // carga las opciones en el select
+
+        })
+        .catch(function (error) {
+
+            console.log(error);
+
+        });
+
+}
+
+// para cargar las posiciones en el ion-select
+function cargarPosiciones() {
+
+    let opciones = "";
+
+    for (let posicion of listaPosiciones) {
+
+        opciones += `
+            <ion-select-option value="${posicion.id}">
+                ${posicion.nombre}
+            </ion-select-option>
+        `;
+
+    }
+
+    document.querySelector("#slcPosicion").innerHTML = opciones;
+
+}
+
+function obtenerSelecciones() {
+
+    fetch(`${urlBase}/selecciones`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}` // envia la autorización
+        }
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (informacion) {
+
+            console.log(informacion);
+
+            listaSelecciones = informacion.selecciones; // guarda las selecciones
+
+            cargarSelecciones(); // y carga el select
+
+        })
+        .catch(function (error) {
+
+            console.log(error);
+
+        });
+
+}
+
+
+// Carga las selecciones en el ion-select
+function cargarSelecciones() {
+
+    let opciones = "";
+
+    for (let seleccion of listaSelecciones) {
+
+        opciones += `
+            <ion-select-option value="${seleccion.id}">
+                ${seleccion.emoji} ${seleccion.nombre}
+            </ion-select-option>
+        `;
+
+    }
+
+    document.querySelector("#slcSeleccion").innerHTML = opciones;
+
+}
+
+// Analisis de Sentimiento
+
+// captura el comentario y prepara el analisis de sentimiento
+function previaAnalizarSentimiento() {
+
+    let comentario = document.querySelector("#txtComentarioJugador").value;
+
+    let sentimiento = {};
+
+    sentimiento.prompt = comentario; // texto que analiza la IA
+
+    analizarSentimiento(sentimiento);
+
+}
+
+// envia el comentario a la ia para poder clasificarlo
+function analizarSentimiento(sentimiento) {
+
+    fetch(`${urlBase}/genai`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(sentimiento)
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (informacion) {
+
+            console.log(informacion);
+
+            if (informacion.score > 0) {
+
+                previaRegistrarJugador(); // continua con el registro
+
+            }
+            else {
+
+                mostrarMensaje(
+                    "ERROR",
+                    "Comentario negativo",
+                    "No se puede registrar el jugador."
+                );
+
+            }
+
+        })
+        .catch(function (error) {
+
+            console.log(error);
+
+        });
+
+}
+
+// captura los datos del formulario y arma el objeto jugador
+function previaRegistrarJugador() {
+
+    let nombre = document.querySelector("#txtNombreJugador").value;
+    let idSeleccion = document.querySelector("#slcSeleccion").value;
+    let idPosicion = document.querySelector("#slcPosicion").value;
+    let fechaNacimiento = document.querySelector("#txtFechaNacimiento").value;
+
+    let nuevoJugador = {};
+
+    nuevoJugador.nombre = nombre;
+    nuevoJugador.idSeleccion = Number(idSeleccion);
+    nuevoJugador.posicion = Number(idPosicion);
+    nuevoJugador.fechaNacimiento = fechaNacimiento;
+
+    registrarJugador(nuevoJugador);
+
+}
+
+
+// envia el jugador a la api
+function registrarJugador(nuevoJugador) {
+
+    console.log(nuevoJugador); // esto se puede borrar, es para verificar los datos enviados
+
+    fetch(`${urlBase}/jugadores`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify(nuevoJugador) // enviar el jugador
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (informacion) {
+
+            console.log(informacion);
+
+            if (informacion.codigo >= 200 && informacion.codigo < 300) {
+
+                mostrarMensaje(
+                    "SUCCESS",
+                    "Éxito",
+                    "Jugador registrado correctamente.",
+                    3000
+                );
+
+                ocultarTodasPantallas();
+                pantallaHome.style.display = "block";
+
+            }
+            else {
+
+                mostrarMensaje(
+                    "ERROR",
+                    "Error",
+                    informacion.mensaje,
+                    3000
+                );
+
+            }
+
+        })
+        .catch(function (error) {
+
+            console.log(error);
+
+        });
+
 }
 
 // NO OBLIGATORIO

@@ -20,7 +20,7 @@
             <ion-route url="/login" component="page-login"></ion-route>
             <ion-route url="/registrarU" component="page-registrarU"></ion-route>
             <ion-route url="/listado" component="page-listado"></ion-route>
-            <ion-route url="/rendimiento" component="page-rendimiento"></ion-route>
+            <ion-route url="/registrarJugadores" component="page-registrarJugadores"></ion-route>
             <ion-route url="/estadistica" component="page-estadistica"></ion-route>
             <ion-route url="/mapa" component="page-mapa"></ion-route>
         </ion-router>
@@ -56,8 +56,8 @@
 
                 <!-- IMPLEMENTAR LOS CAMBIOS A LO DE ABAJO -->
 
-                <ion-item href="/rendimiento" id="btnMenuRegistrarRendimiento" onclick="cerrarMenu()">
-                    <ion-label>Registrar Rendimiento...</ion-label>
+                <ion-item href="/registrarJugadores" id="btnMenuRegistrarJugadores" onclick="cerrarMenu()">
+                    <ion-label>Registrar Jugadores...</ion-label>
                 </ion-item>
 
                 <ion-item href="/estadistica" id="btnMenuEstadistica" onclick="cerrarMenu()">
@@ -169,8 +169,8 @@
                 </ion-content>
             </page-listado>
 
-            <!-- Pantalla Rendimiento -->
-            <page-rendimiento class="ion-page" id="pantalla-rendimiento">
+            <!-- Pantalla Registrar Jugadores -->
+            <page-registrarJugadores class="ion-page" id="pantalla-registrarJugadores">
 
                 <ion-header>
                     <ion-toolbar>
@@ -180,10 +180,42 @@
                         <ion-title>World Cup Fan</ion-title>
                     </ion-toolbar>
                 </ion-header>
+
                 <ion-content class="ion-padding">
-                    Rendimiento
+
+                    <ion-item>
+                        <ion-input label="Nombre" id="txtNombreJugador"></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-select label="Selección" id="slcSeleccion">
+                        </ion-select>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-select label="Posición" id="slcPosicion">
+                        </ion-select>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-input label="Fecha de nacimiento" id="txtFechaNacimiento" type="date">
+                        </ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-textarea label="Comentario" id="txtComentarioJugador">
+                        </ion-textarea>
+                    </ion-item>
+
+                    <ion-button id="btnRegistrarJugador">
+                        Registrar Jugador
+                    </ion-button>
+
+                    <!-- lugar para mostrar mensajes -->
+                    <ion-text id="lblMensajeJugador"></ion-text>
+
                 </ion-content>
-            </page-rendimiento>
+            </page-registrarJugadores>
 
             <!-- Pantalla Estadistica -->
             <page-estadistica class="ion-page" id="pantalla-estadistica">

@@ -161,12 +161,23 @@
                         <ion-buttons slot="start">
                             <ion-menu-button></ion-menu-button>
                         </ion-buttons>
-                        <ion-title>World Cup Fan</ion-title>
+
+                        <ion-title>Listado de Jugadores</ion-title>
+
                     </ion-toolbar>
                 </ion-header>
+
+                <ion-item>
+                    <ion-select label="Filtrar por selección" id="slcFiltroSeleccion" value="todos">
+                    </ion-select>
+                </ion-item>
+
                 <ion-content class="ion-padding">
-                    Listado
+
+                    <div id="sectorListadoJugadores"></div>
+
                 </ion-content>
+
             </page-listado>
 
             <!-- Pantalla Registrar Jugadores -->

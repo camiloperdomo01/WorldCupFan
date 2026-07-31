@@ -49,6 +49,8 @@ function inicio() {
     document.querySelector("#btnMenuLogout").addEventListener("click", hacerLogout);
     document.querySelector("#btnRegistrar").addEventListener("click", previaRegistrarUsuario);
     document.querySelector("#btnRegistrarJugador").addEventListener("click", previaAnalizarSentimiento);
+    document.querySelector("#btnMenuListado").addEventListener("click", previaListadoJugadores);
+    document.querySelector("#slcFiltroSeleccion").addEventListener("ionChange", previaListadoJugadores);
 }
 
 function navegar(evento) {
@@ -67,8 +69,11 @@ function navegar(evento) {
 
     }
 
+    
+
     if (evento.detail.to == "/listado") {
         pantallaListado.style.display = "block";
+
     }
 
     if (evento.detail.to == "/registrarJugadores") {
@@ -609,6 +614,191 @@ function registrarJugador(nuevoJugador) {
         });
 
 }
+
+//  ---------------------------------------------------- LISTADO ----------------------------------------------------
+
+// Obtener los jugadores registrados por el usuario logeado
+
+function previaListadoJugadores() {
+
+    // para cargar las selecciones en el filtro
+    cargarSeleccionesEnFiltro();
+
+    fetch(`${urlBase}/jugadores`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    })
+
+        .then(function (response) {
+            return response.json();
+        })
+
+        .then(function (informacion) {
+
+            console.log(informacion);
+
+            // esto envia la lista para mostrarla en pantalla
+            hacerListadoJugadores(informacion.jugadores);
+
+        })
+
+        .catch(function (error) {
+
+            console.log(error);
+
+        });
+
+
+}
+
+function hacerListadoJugadores(listaJugadores) {
+
+
+    // captura la selección elegida en el filtro
+    let filtro = document.querySelector("#slcFiltroSeleccion").value;
+
+    let listado = "";
+
+    //recorre todos los jugadores
+    for (let jugador of listaJugadores) {
+
+        // Si el usuario eligió "Todas", muestra todos los jugadores.
+        // Si eligió por ejemplo Uruguay (id = 1), unicamente deja pasar los jugadores cuya idSeleccion sea 1.
+        if (filtro != "todos" && jugador.idSeleccion != filtro) {
+            continue;
+        }
+
+        let nombreSeleccion = "";
+        let emoji = "";
+        let nombrePosicion = "";
+
+        // Buscar el nombre y el emoji de laselección
+        for (let seleccion of listaSelecciones) {
+
+            if (seleccion.id == jugador.idSeleccion) {
+
+                nombreSeleccion = seleccion.nombre;
+                emoji = seleccion.emoji;
+
+            }
+
+        }
+
+        // buscar el nombre de la posición
+        for (let posicion of listaPosiciones) {
+
+            if (posicion.id == jugador.posicion) {
+
+                nombrePosicion = posicion.nombre;
+
+            }
+
+        }
+
+
+
+        listado += `
+        <ion-item>
+
+            <ion-label>
+
+                <h2>${jugador.nombre}</h2>
+
+                <p>Selección: ${emoji} ${nombreSeleccion}</p>
+
+                <p>Posición: ${nombrePosicion}</p>
+
+                <p>Fecha de Nacimiento: ${jugador.fechaNacimiento}</p>
+
+            </ion-label>
+
+            <ion-button
+                color="danger"
+                onclick="eliminarJugador(${jugador.id})">
+
+                Eliminar
+
+            </ion-button>
+
+        </ion-item>
+        `;
+
+    }
+    // Mostrar el listado en pantalla
+    document.querySelector("#sectorListadoJugadores").innerHTML = listado;
+
+}
+
+function eliminarJugador(idJugador) {
+
+    fetch(`${urlBase}/jugadores/${idJugador}`, {
+
+        method: "DELETE",
+
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+
+    })
+
+        .then(function (response) {
+            return response.json();
+        })
+
+        .then(function (informacion) {
+
+            console.log(informacion);
+
+            previaListadoJugadores(); // para actualizar el listado luego de eliminar
+
+        })
+
+        .catch(function (error) {
+
+            console.log(error);
+
+        });
+
+}
+
+function cargarSeleccionesEnFiltro() {
+
+    let opciones = "";
+
+    // agrega la opción "Todas"
+    opciones += `
+        <ion-select-option value="todos">
+            Todas
+        </ion-select-option>
+    `;
+
+    // Agrega las selecciones obtenidas de la API
+    for (let seleccion of listaSelecciones) {
+
+        opciones += `
+            <ion-select-option value="${seleccion.id}">
+                ${seleccion.emoji} ${seleccion.nombre}
+            </ion-select-option>
+        `;
+
+    }
+
+    // Mostrar las opciones en el select
+
+    document.querySelector("#slcFiltroSeleccion").innerHTML = opciones;
+
+    //     // Dejar seleccionado "Todas"
+    // document.querySelector("#slcFiltroSeleccion").value = "todos";
+
+}
+
+
+
+
 
 // NO OBLIGATORIO
 

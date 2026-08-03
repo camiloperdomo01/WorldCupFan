@@ -51,6 +51,7 @@ function inicio() {
     document.querySelector("#btnRegistrarJugador").addEventListener("click", previaAnalizarSentimiento);
     document.querySelector("#btnMenuListado").addEventListener("click", previaListadoJugadores);
     document.querySelector("#slcFiltroSeleccion").addEventListener("ionChange", previaListadoJugadores);
+    document.querySelector("#btnMenuEstadistica").addEventListener("click", previaEstadistica);
 }
 
 function navegar(evento) {
@@ -69,7 +70,7 @@ function navegar(evento) {
 
     }
 
-    
+
 
     if (evento.detail.to == "/listado") {
         pantallaListado.style.display = "block";
@@ -797,8 +798,117 @@ function cargarSeleccionesEnFiltro() {
 }
 
 
+//  ---------------------------------------------------- ESTADISTICA ----------------------------------------------------
+
+function previaEstadistica() {
+
+    fetch(`${urlBase}/jugadores`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${localStorage.getItem("token")}`
+        }
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (informacion) {
+
+            console.log(informacion);
+
+            hacerEstadistica(informacion.jugadores);
+
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
+}
+
+function hacerEstadistica(listaJugadores) {
+
+    document.querySelector("#sectorEstadistica").innerHTML = "";
+
+    // Cantidad de jugadores de la selección actual
+    let contador = 0;
+
+    // Mayor cantidad encontrada
+    let maximo = 0;
+
+    // Selecciones que tienen el máximo
+    let mejoresSelecciones = [];
+
+    for (let seleccion of listaSelecciones) {
+
+        contador = 0;
+
+        for (let jugador of listaJugadores) {
+
+            if (jugador.idSeleccion == seleccion.id) {
+                contador++;
+            }
+
+        }
+        if (contador > maximo) {
+
+            maximo = contador;
+            mejoresSelecciones = [];
+            mejoresSelecciones.push(seleccion);
+
+        }
+
+        else if (contador == maximo && contador > 0) {
+
+            mejoresSelecciones.push(seleccion);
+
+        }
+
+    }
 
 
+
+    // caso cuando no hay jugadores registrados
+    if (maximo == 0) {
+
+        document.querySelector("#sectorEstadistica").innerHTML = `
+            <h2>Selección favorita</h2>
+            <p>No tienes jugadores registrados.</p>
+        `;
+
+    }
+    // caso en el que hay una sola seleccion favorita
+    else if (mejoresSelecciones.length == 1) {
+
+        let seleccionFavorita = mejoresSelecciones[0];
+
+        document.querySelector("#sectorEstadistica").innerHTML = `
+            <h2>Selección favorita</h2>
+            <p>${seleccionFavorita.emoji} ${seleccionFavorita.nombre}</p>
+            <p>Jugadores registrados: ${maximo}</p>
+        `;
+
+    }
+    // caso de que haya empate
+    else {
+
+        let texto = `
+            <h2>Empate entre selecciones</h2>
+            <p>Cada una tiene ${maximo} jugadores.</p>
+        `;
+
+        for (let seleccion of mejoresSelecciones) {
+
+            texto += `
+                <p>${seleccion.emoji} ${seleccion.nombre}</p>
+            `;
+
+        }
+
+        document.querySelector("#sectorEstadistica").innerHTML = texto;
+
+    }
+
+}
 
 // NO OBLIGATORIO
 

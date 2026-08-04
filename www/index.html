@@ -9,6 +9,18 @@
     <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
     <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css" />
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+
+    <style>
+        #map {
+            height: 480px;
+            width: 320px;
+        }
+    </style>
 </head>
 
 <body>
@@ -25,7 +37,6 @@
             <ion-route url="/mapa" component="page-mapa"></ion-route>
         </ion-router>
         <ion-nav></ion-nav>
-
 
         <!-- SECTOR DE MENU PRINCIPAL () -->
 
@@ -44,7 +55,6 @@
                     <ion-label>Login...</ion-label>
                 </ion-item>
 
-
                 <ion-item href="/listado" id="btnMenuListado" onclick="cerrarMenu()">
                     <ion-label>Listado...</ion-label>
                 </ion-item>
@@ -52,7 +62,6 @@
                 <ion-item href="/" id="btnMenuLogout" onclick="cerrarMenu()">
                     <ion-label>Logout...</ion-label>
                 </ion-item>
-
 
                 <!-- IMPLEMENTAR LOS CAMBIOS A LO DE ABAJO -->
 
@@ -67,17 +76,14 @@
                 <ion-item href="/mapa" id="btnMenuMapa" onclick="cerrarMenu()">
                     <ion-label>Mapa...</ion-label>
                 </ion-item>
-
             </ion-content>
         </ion-menu>
 
         <div class="ion-page" id="main-content">
-
             <!-- SECTOR DE PANTALLAS (CADA UNA DE LAS PANTALLAS QUE VA A TENER MI APLICACION EN FORMATO ION PAGE. UNA PAGINA POR CADA COSA(LOGIN, ETC)) -->
 
             <!-- Pantalla principal -->
             <page-home class="ion-page" id="pantalla-home">
-
                 <ion-header>
                     <ion-toolbar>
                         <ion-buttons slot="start">
@@ -93,7 +99,6 @@
 
             <!-- Pantalla Login -->
             <page-login class="ion-page" id="pantalla-login">
-
                 <ion-header>
                     <ion-toolbar>
                         <ion-buttons slot="start">
@@ -113,13 +118,10 @@
                     <!-- lugar para mostrar mensajes -->
                     <ion-text id="lblMensajeLogin"></ion-text>
                 </ion-content>
-
-
             </page-login>
 
             <!-- Pantalla Registrar Usuario -->
             <page-registrarU class="ion-page" id="pantalla-registrarU">
-
                 <ion-header>
                     <ion-toolbar>
                         <ion-buttons slot="start">
@@ -129,7 +131,6 @@
                     </ion-toolbar>
                 </ion-header>
                 <ion-content class="ion-padding">
-
                     <ion-item>
                         <ion-input label="Usuario" id="txtUsuarioRegistro"></ion-input>
                     </ion-item>
@@ -140,22 +141,17 @@
                     </ion-item>
 
                     <ion-item>
-                        <ion-select label="País" id="slcPais">
-                        </ion-select>
+                        <ion-select label="País" id="slcPais"> </ion-select>
                     </ion-item>
 
-                    <ion-button id="btnRegistrar">
-                        Registrar
-                    </ion-button>
+                    <ion-button id="btnRegistrar"> Registrar </ion-button>
                     <!-- lugar para mostrar mensajes -->
                     <ion-text id="lblMensajeRegistro"></ion-text>
-
                 </ion-content>
             </page-registrarU>
 
             <!-- Pantalla Listado -->
             <page-listado class="ion-page" id="pantalla-listado">
-
                 <ion-header>
                     <ion-toolbar>
                         <ion-buttons slot="start">
@@ -163,7 +159,6 @@
                         </ion-buttons>
 
                         <ion-title>Listado de Jugadores</ion-title>
-
                     </ion-toolbar>
                 </ion-header>
 
@@ -173,16 +168,12 @@
                 </ion-item>
 
                 <ion-content class="ion-padding">
-
                     <div id="sectorListadoJugadores"></div>
-
                 </ion-content>
-
             </page-listado>
 
             <!-- Pantalla Registrar Jugadores -->
             <page-registrarJugadores class="ion-page" id="pantalla-registrarJugadores">
-
                 <ion-header>
                     <ion-toolbar>
                         <ion-buttons slot="start">
@@ -193,19 +184,16 @@
                 </ion-header>
 
                 <ion-content class="ion-padding">
-
                     <ion-item>
                         <ion-input label="Nombre" id="txtNombreJugador"></ion-input>
                     </ion-item>
 
                     <ion-item>
-                        <ion-select label="Selección" id="slcSeleccion">
-                        </ion-select>
+                        <ion-select label="Selección" id="slcSeleccion"> </ion-select>
                     </ion-item>
 
                     <ion-item>
-                        <ion-select label="Posición" id="slcPosicion">
-                        </ion-select>
+                        <ion-select label="Posición" id="slcPosicion"> </ion-select>
                     </ion-item>
 
                     <ion-item>
@@ -224,13 +212,11 @@
 
                     <!-- lugar para mostrar mensajes -->
                     <ion-text id="lblMensajeJugador"></ion-text>
-
                 </ion-content>
             </page-registrarJugadores>
 
             <!-- Pantalla Estadistica -->
             <page-estadistica class="ion-page" id="pantalla-estadistica">
-
                 <ion-header>
                     <ion-toolbar>
                         <ion-buttons slot="start">
@@ -246,7 +232,6 @@
 
             <!-- Pantalla Mapa -->
             <page-mapa class="ion-page" id="pantalla-mapa">
-
                 <ion-header>
                     <ion-toolbar>
                         <ion-buttons slot="start">
@@ -255,13 +240,10 @@
                         <ion-title>World Cup Fan</ion-title>
                     </ion-toolbar>
                 </ion-header>
-                <ion-content class="ion-padding">
-                    Mapa
-                </ion-content>
+                <ion-content class="ion-padding" id="map"></ion-content>
             </page-mapa>
         </div>
     </ion-app>
-
 
     <script src="obligatorio.js"></script>
 </body>

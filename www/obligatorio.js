@@ -7,10 +7,11 @@ const pantallaHome = document.querySelector("#pantalla-home");
 const pantallaLogin = document.querySelector("#pantalla-login");
 const pantallaRegistrarU = document.querySelector("#pantalla-registrarU");
 const pantallaListado = document.querySelector("#pantalla-listado");
-const pantallaRegistrarJugadores = document.querySelector("#pantalla-registrarJugadores");
+const pantallaRegistrarJugadores = document.querySelector(
+    "#pantalla-registrarJugadores",
+);
 const pantallaEstadistica = document.querySelector("#pantalla-estadistica");
 const pantallaMapa = document.querySelector("#pantalla-mapa");
-
 
 const urlBase = "https://worldcupfan.develotion.com";
 
@@ -20,38 +21,53 @@ let listaPaises = [];
 let listaPosiciones = [];
 let listaSelecciones = [];
 
+// mapa
+
+let miLatitud;
+let miLongitud;
+let map;
+
 inicio();
 
 function inicio() {
-
     obtenerPaises();
-
 
     // cuando el usuario vuelva a abrir la aplicación, ya entra como logueado.
     if (localStorage.getItem("token") != null) {
-
         mostrarMenuVip();
 
         ocultarTodasPantallas();
         pantallaHome.style.display = "block";
 
         mostrarBienvenida(); // NO OBLIGATORIO
-    }
-    else {
-
+    } else {
         mostrarMenuAnonimo();
-
     }
 
     ruteo.addEventListener("ionRouteDidChange", navegar);
 
-    document.querySelector("#btnLogin").addEventListener("click", previaHacerLogin);
-    document.querySelector("#btnMenuLogout").addEventListener("click", hacerLogout);
-    document.querySelector("#btnRegistrar").addEventListener("click", previaRegistrarUsuario);
-    document.querySelector("#btnRegistrarJugador").addEventListener("click", previaAnalizarSentimiento);
-    document.querySelector("#btnMenuListado").addEventListener("click", previaListadoJugadores);
-    document.querySelector("#slcFiltroSeleccion").addEventListener("ionChange", previaListadoJugadores);
-    document.querySelector("#btnMenuEstadistica").addEventListener("click", previaEstadistica);
+    document
+        .querySelector("#btnLogin")
+        .addEventListener("click", previaHacerLogin);
+    document
+        .querySelector("#btnMenuLogout")
+        .addEventListener("click", hacerLogout);
+    document
+        .querySelector("#btnRegistrar")
+        .addEventListener("click", previaRegistrarUsuario);
+    document
+        .querySelector("#btnRegistrarJugador")
+        .addEventListener("click", previaAnalizarSentimiento);
+    document
+        .querySelector("#btnMenuListado")
+        .addEventListener("click", previaListadoJugadores);
+    document
+        .querySelector("#slcFiltroSeleccion")
+        .addEventListener("ionChange", previaListadoJugadores);
+    document
+        .querySelector("#btnMenuEstadistica")
+        .addEventListener("click", previaEstadistica);
+    document.querySelector("#btnMenuMapa").addEventListener("click", previaMapa);
 }
 
 function navegar(evento) {
@@ -67,14 +83,10 @@ function navegar(evento) {
 
     if (evento.detail.to == "/registrarU") {
         pantallaRegistrarU.style.display = "block";
-
     }
-
-
 
     if (evento.detail.to == "/listado") {
         pantallaListado.style.display = "block";
-
     }
 
     if (evento.detail.to == "/registrarJugadores") {
@@ -89,7 +101,6 @@ function navegar(evento) {
         pantallaMapa.style.display = "block";
     }
 }
-
 
 function ocultarTodasPantallas() {
     pantallaHome.style.display = "none";
@@ -142,40 +153,32 @@ function previaHacerLogin() {
 
     // creo el objeto
     // ojo que los campos tienen que ser iguales a los de la documentacion
-    // 
+    //
     let usuarioLogin = new Object();
     usuarioLogin.usuario = usuario;
     usuarioLogin.password = password;
 
-
-
-    hacerLogin(usuarioLogin)
+    hacerLogin(usuarioLogin);
 }
 
 function hacerLogin(usuarioLogin) {
     fetch(`${urlBase}/login`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(usuarioLogin) // El objeto es lo que recibe por parametro
+        body: JSON.stringify(usuarioLogin), // El objeto es lo que recibe por parametro
     })
         .then(function (response) {
-            console.log(response)
-            return response.json()
+            console.log(response);
+            return response.json();
         })
         .then(function (informacion) {
             if (informacion.codigo >= 200 && informacion.codigo < 300) {
-
-
-
-
                 localStorage.setItem("token", informacion.token);
                 localStorage.setItem("usuario", usuarioLogin.usuario); // NO OBLIGATORIO
 
                 mostrarMenuVip();
-
-
 
                 ocultarTodasPantallas();
                 pantallaHome.style.display = "block";
@@ -183,21 +186,15 @@ function hacerLogin(usuarioLogin) {
                 document.querySelector("#lblMensajeLogin").innerHTML = "";
 
                 mostrarBienvenida(); // NO OBLIGATORIO
-            }
-            else {
+            } else {
                 // agregue un caso de error
                 document.querySelector("#lblMensajeLogin").innerHTML =
                     informacion.mensaje;
-
             }
-
-
-
-
         })
         .catch(function (error) {
-            console.log(error)
-        })
+            console.log(error);
+        });
 }
 
 function hacerLogout() {
@@ -217,52 +214,40 @@ function hacerLogout() {
 // Funciones de países
 
 function obtenerPaises() {
-
     fetch(`${urlBase}/paises`)
-
         .then(function (response) {
             return response.json();
         })
 
         .then(function (informacion) {
-
             listaPaises = informacion.paises;
 
             cargarPaises();
-
         })
 
         .catch(function (error) {
-
             console.log(error);
-
         });
-
 }
 
 function cargarPaises() {
-
     let opciones = "";
 
     for (let pais of listaPaises) {
-
         opciones += `
             <ion-select-option value="${pais.id}">
                 ${pais.nombre}
             </ion-select-option>
         `;
-
     }
 
     document.querySelector("#slcPais").innerHTML = opciones;
-
 }
 
 // Cuando el usuario toca el botón Registrar los datos se capturan en el registro
 // Se ingresa usuario, contraseña y país de residencia
 
 function previaRegistrarUsuario() {
-
     let usuario = document.querySelector("#txtUsuarioRegistro").value;
 
     let password = document.querySelector("#txtPasswordRegistro").value;
@@ -276,36 +261,30 @@ function previaRegistrarUsuario() {
     nuevoUsuario.idPais = Number(idPais);
 
     registrarUsuario(nuevoUsuario);
-
 }
 
 // hacer el POST y enviar el registro al endpoint /usuarios
 
 function registrarUsuario(nuevoUsuario) {
-
     fetch(`${urlBase}/usuarios`, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(nuevoUsuario)
+        body: JSON.stringify(nuevoUsuario),
     })
         .then(function (response) {
             return response.json();
         })
         .then(function (informacion) {
-
             console.log(informacion);
 
             if (informacion.codigo >= 200 && informacion.codigo < 300) {
-
                 // guardar token
                 localStorage.setItem("token", informacion.token);
                 localStorage.setItem("usuario", nuevoUsuario.usuario);
 
-
                 mostrarBienvenida(); // no obligatorio
-
 
                 // cambiar menú
                 mostrarMenuVip();
@@ -321,42 +300,29 @@ function registrarUsuario(nuevoUsuario) {
                 mostrarMensaje(
                     "SUCCESS",
                     "Registro exitoso",
-                    "El usuario fue registrado correctamente."
+                    "El usuario fue registrado correctamente.",
                 );
-
-            }
-            else {
-
+            } else {
                 // Mostrar el error en la interfaz (esto lo voy a borrar despues dale)
                 document.querySelector("#lblMensajeRegistro").innerHTML =
                     informacion.mensaje;
 
                 // Toast de error
-                mostrarMensaje(
-                    "ERROR",
-                    "Error",
-                    informacion.mensaje
-                );
-
+                mostrarMensaje("ERROR", "Error", informacion.mensaje);
             }
-
         })
         .catch(function (error) {
-
             console.log(error);
 
             mostrarMensaje(
                 "ERROR",
                 "Error de conexion",
-                "No fue posible comunicarse con el servidor."
+                "No fue posible comunicarse con el servidor.",
             );
-
         });
-
 }
 
 function mostrarMensaje(tipo, titulo, texto, duracion) {
-
     const toast = document.createElement("ion-toast");
 
     toast.header = titulo;
@@ -371,12 +337,10 @@ function mostrarMensaje(tipo, titulo, texto, duracion) {
     if (tipo === "ERROR") {
         toast.color = "danger";
         toast.icon = "alert-circle-outline";
-    }
-    else if (tipo === "WARNING") {
+    } else if (tipo === "WARNING") {
         toast.color = "warning";
         toast.icon = "warning-outline";
-    }
-    else if (tipo === "SUCCESS") {
+    } else if (tipo === "SUCCESS") {
         toast.color = "success";
         toast.icon = "checkmark-circle-outline";
     }
@@ -390,107 +354,85 @@ function mostrarMensaje(tipo, titulo, texto, duracion) {
 // Obtiene las posiciones disponibles desde la API
 
 function obtenerPosiciones() {
-
     fetch(`${urlBase}/posiciones`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}` // esto envia el token del usuario logueado
-        }
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // esto envia el token del usuario logueado
+        },
     })
         .then(function (response) {
             return response.json();
         })
         .then(function (informacion) {
-
             console.log(informacion);
 
             listaPosiciones = informacion.posiciones; // guarda las posiciones recibidas
 
             cargarPosiciones(); // carga las opciones en el select
-
         })
         .catch(function (error) {
-
             console.log(error);
-
         });
-
 }
 
 // para cargar las posiciones en el ion-select
 function cargarPosiciones() {
-
     let opciones = "";
 
     for (let posicion of listaPosiciones) {
-
         opciones += `
             <ion-select-option value="${posicion.id}">
                 ${posicion.nombre}
             </ion-select-option>
         `;
-
     }
 
     document.querySelector("#slcPosicion").innerHTML = opciones;
-
 }
 
 function obtenerSelecciones() {
-
     fetch(`${urlBase}/selecciones`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}` // envia la autorización
-        }
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // envia la autorización
+        },
     })
         .then(function (response) {
             return response.json();
         })
         .then(function (informacion) {
-
             console.log(informacion);
 
             listaSelecciones = informacion.selecciones; // guarda las selecciones
 
             cargarSelecciones(); // y carga el select
-
         })
         .catch(function (error) {
-
             console.log(error);
-
         });
-
 }
-
 
 // Carga las selecciones en el ion-select
 function cargarSelecciones() {
-
     let opciones = "";
 
     for (let seleccion of listaSelecciones) {
-
         opciones += `
             <ion-select-option value="${seleccion.id}">
                 ${seleccion.emoji} ${seleccion.nombre}
             </ion-select-option>
         `;
-
     }
 
     document.querySelector("#slcSeleccion").innerHTML = opciones;
-
 }
 
 // Analisis de Sentimiento
 
 // captura el comentario y prepara el analisis de sentimiento
 function previaAnalizarSentimiento() {
-
     let comentario = document.querySelector("#txtComentarioJugador").value;
 
     let sentimiento = {};
@@ -498,54 +440,41 @@ function previaAnalizarSentimiento() {
     sentimiento.prompt = comentario; // texto que analiza la IA
 
     analizarSentimiento(sentimiento);
-
 }
 
 // envia el comentario a la ia para poder clasificarlo
 function analizarSentimiento(sentimiento) {
-
     fetch(`${urlBase}/genai`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(sentimiento)
+        body: JSON.stringify(sentimiento),
     })
         .then(function (response) {
             return response.json();
         })
         .then(function (informacion) {
-
             console.log(informacion);
 
             if (informacion.score > 0) {
-
                 previaRegistrarJugador(); // continua con el registro
-
-            }
-            else {
-
+            } else {
                 mostrarMensaje(
                     "ERROR",
                     "Comentario negativo",
-                    "No se puede registrar el jugador."
+                    "No se puede registrar el jugador.",
                 );
-
             }
-
         })
         .catch(function (error) {
-
             console.log(error);
-
         });
-
 }
 
 // captura los datos del formulario y arma el objeto jugador
 function previaRegistrarJugador() {
-
     let nombre = document.querySelector("#txtNombreJugador").value;
     let idSeleccion = document.querySelector("#slcSeleccion").value;
     let idPosicion = document.querySelector("#slcPosicion").value;
@@ -559,61 +488,43 @@ function previaRegistrarJugador() {
     nuevoJugador.fechaNacimiento = fechaNacimiento;
 
     registrarJugador(nuevoJugador);
-
 }
-
 
 // envia el jugador a la api
 function registrarJugador(nuevoJugador) {
-
     console.log(nuevoJugador); // esto se puede borrar, es para verificar los datos enviados
 
     fetch(`${urlBase}/jugadores`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(nuevoJugador) // enviar el jugador
+        body: JSON.stringify(nuevoJugador), // enviar el jugador
     })
         .then(function (response) {
             return response.json();
         })
         .then(function (informacion) {
-
             console.log(informacion);
 
             if (informacion.codigo >= 200 && informacion.codigo < 300) {
-
                 mostrarMensaje(
                     "SUCCESS",
                     "Éxito",
                     "Jugador registrado correctamente.",
-                    3000
+                    3000,
                 );
 
                 ocultarTodasPantallas();
                 pantallaHome.style.display = "block";
-
+            } else {
+                mostrarMensaje("ERROR", "Error", informacion.mensaje, 3000);
             }
-            else {
-
-                mostrarMensaje(
-                    "ERROR",
-                    "Error",
-                    informacion.mensaje,
-                    3000
-                );
-
-            }
-
         })
         .catch(function (error) {
-
             console.log(error);
-
         });
-
 }
 
 //  ---------------------------------------------------- LISTADO ----------------------------------------------------
@@ -621,7 +532,6 @@ function registrarJugador(nuevoJugador) {
 // Obtener los jugadores registrados por el usuario logeado
 
 function previaListadoJugadores() {
-
     // para cargar las selecciones en el filtro
     cargarSeleccionesEnFiltro();
 
@@ -629,35 +539,26 @@ function previaListadoJugadores() {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-        }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
     })
-
         .then(function (response) {
             return response.json();
         })
 
         .then(function (informacion) {
-
             console.log(informacion);
 
             // esto envia la lista para mostrarla en pantalla
             hacerListadoJugadores(informacion.jugadores);
-
         })
 
         .catch(function (error) {
-
             console.log(error);
-
         });
-
-
 }
 
 function hacerListadoJugadores(listaJugadores) {
-
-
     // captura la selección elegida en el filtro
     let filtro = document.querySelector("#slcFiltroSeleccion").value;
 
@@ -665,7 +566,6 @@ function hacerListadoJugadores(listaJugadores) {
 
     //recorre todos los jugadores
     for (let jugador of listaJugadores) {
-
         // Si el usuario eligió "Todas", muestra todos los jugadores.
         // Si eligió por ejemplo Uruguay (id = 1), unicamente deja pasar los jugadores cuya idSeleccion sea 1.
         if (filtro != "todos" && jugador.idSeleccion != filtro) {
@@ -678,28 +578,18 @@ function hacerListadoJugadores(listaJugadores) {
 
         // Buscar el nombre y el emoji de laselección
         for (let seleccion of listaSelecciones) {
-
             if (seleccion.id == jugador.idSeleccion) {
-
                 nombreSeleccion = seleccion.nombre;
                 emoji = seleccion.emoji;
-
             }
-
         }
 
         // buscar el nombre de la posición
         for (let posicion of listaPosiciones) {
-
             if (posicion.id == jugador.posicion) {
-
                 nombrePosicion = posicion.nombre;
-
             }
-
         }
-
-
 
         listado += `
         <ion-item>
@@ -726,48 +616,36 @@ function hacerListadoJugadores(listaJugadores) {
 
         </ion-item>
         `;
-
     }
     // Mostrar el listado en pantalla
     document.querySelector("#sectorListadoJugadores").innerHTML = listado;
-
 }
 
 function eliminarJugador(idJugador) {
-
     fetch(`${urlBase}/jugadores/${idJugador}`, {
-
         method: "DELETE",
 
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-        }
-
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
     })
-
         .then(function (response) {
             return response.json();
         })
 
         .then(function (informacion) {
-
             console.log(informacion);
 
             previaListadoJugadores(); // para actualizar el listado luego de eliminar
-
         })
 
         .catch(function (error) {
-
             console.log(error);
-
         });
-
 }
 
 function cargarSeleccionesEnFiltro() {
-
     let opciones = "";
 
     // agrega la opción "Todas"
@@ -779,13 +657,11 @@ function cargarSeleccionesEnFiltro() {
 
     // Agrega las selecciones obtenidas de la API
     for (let seleccion of listaSelecciones) {
-
         opciones += `
             <ion-select-option value="${seleccion.id}">
                 ${seleccion.emoji} ${seleccion.nombre}
             </ion-select-option>
         `;
-
     }
 
     // Mostrar las opciones en el select
@@ -794,39 +670,32 @@ function cargarSeleccionesEnFiltro() {
 
     //     // Dejar seleccionado "Todas"
     // document.querySelector("#slcFiltroSeleccion").value = "todos";
-
 }
-
 
 //  ---------------------------------------------------- ESTADISTICA ----------------------------------------------------
 
 function previaEstadistica() {
-
     fetch(`${urlBase}/jugadores`, {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${localStorage.getItem("token")}`
-        }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
     })
         .then(function (response) {
             return response.json();
         })
         .then(function (informacion) {
-
             console.log(informacion);
 
             hacerEstadistica(informacion.jugadores);
-
         })
         .catch(function (error) {
             console.log(error);
         });
-
 }
 
 function hacerEstadistica(listaJugadores) {
-
     document.querySelector("#sectorEstadistica").innerHTML = "";
 
     // Cantidad de jugadores de la selección actual
@@ -839,46 +708,31 @@ function hacerEstadistica(listaJugadores) {
     let mejoresSelecciones = [];
 
     for (let seleccion of listaSelecciones) {
-
         contador = 0;
 
         for (let jugador of listaJugadores) {
-
             if (jugador.idSeleccion == seleccion.id) {
                 contador++;
             }
-
         }
         if (contador > maximo) {
-
             maximo = contador;
             mejoresSelecciones = [];
             mejoresSelecciones.push(seleccion);
-
-        }
-
-        else if (contador == maximo && contador > 0) {
-
+        } else if (contador == maximo && contador > 0) {
             mejoresSelecciones.push(seleccion);
-
         }
-
     }
-
-
 
     // caso cuando no hay jugadores registrados
     if (maximo == 0) {
-
         document.querySelector("#sectorEstadistica").innerHTML = `
             <h2>Selección favorita</h2>
             <p>No tienes jugadores registrados.</p>
         `;
-
     }
     // caso en el que hay una sola seleccion favorita
     else if (mejoresSelecciones.length == 1) {
-
         let seleccionFavorita = mejoresSelecciones[0];
 
         document.querySelector("#sectorEstadistica").innerHTML = `
@@ -886,47 +740,122 @@ function hacerEstadistica(listaJugadores) {
             <p>${seleccionFavorita.emoji} ${seleccionFavorita.nombre}</p>
             <p>Jugadores registrados: ${maximo}</p>
         `;
-
     }
     // caso de que haya empate
     else {
-
         let texto = `
             <h2>Empate entre selecciones</h2>
             <p>Cada una tiene ${maximo} jugadores.</p>
         `;
 
         for (let seleccion of mejoresSelecciones) {
-
             texto += `
                 <p>${seleccion.emoji} ${seleccion.nombre}</p>
             `;
-
         }
 
         document.querySelector("#sectorEstadistica").innerHTML = texto;
+    }
+}
 
+//  ---------------------------------------------------- MAPA ----------------------------------------------------
+
+function previaMapa() {
+    fetch(`${urlBase}/usuariosPorPais`, {
+        method: "GET",
+        headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+    })
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (informacion) {
+            listaUsuariosPais = informacion.paises;
+
+            navigator.geolocation.getCurrentPosition(miUbicacion);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+}
+
+function miUbicacion(position) {
+    miLatitud = position.coords.latitude;
+    miLongitud = position.coords.longitude;
+
+    armarMapa(listaUsuariosPais);
+}
+
+function armarMapa(listaUsuariosPorPais) {
+    // para que se evite crear el mapa mas de una vez
+    if (map != null) {
+        map.remove();
     }
 
+    // Centrar el mapa en donde estoy
+    map = L.map("map").setView([miLatitud, miLongitud], 15);
+
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 17,
+        attribution: "&copy; OpenStreetMap",
+    }).addTo(map);
+
+    // Recorre todos los países
+    for (let pais of listaPaises) {
+        let cantidadUsuarios = 0;
+
+        // este for buscara la cantidad de usuarios de ese pais
+        for (let dato of listaUsuariosPorPais) {
+            if (pais.id == dato.id) {
+                cantidadUsuarios = dato.cantidadDeUsuarios;
+            }
+        }
+
+        // variable para crear el marcador en el mapa 
+        let marker = L.marker([pais.latitud, pais.longitud]).addTo(map);
+
+        marker.bindTooltip(`${pais.nombre}<br>Usuarios: ${cantidadUsuarios}`);
+    }
 }
 
 // NO OBLIGATORIO
 
 function mostrarBienvenida() {
-
     let usuario = localStorage.getItem("usuario");
 
     if (usuario != null) {
-
         document.querySelector("#lblBienvenida").innerHTML =
             "Bienvenido " + usuario + " a World Cup Fan";
-
-    }
-    else {
-
+    } else {
         document.querySelector("#lblBienvenida").innerHTML =
             "Bienvenido al sitio de World Cup Fan";
-
     }
-
 }
+
+/*
+function inicio(){
+    navigator.geolocation.getCurrentPosition(miUbicacion)
+}
+function miUbicacion(position){
+    console.log(position)
+    miLatitud= position.coords.latitude 
+    miLongitud= position.coords.longitude
+    console.log(miLatitud)
+    console.log(miLongitud)
+    armarMapa()
+}
+function armarMapa(){
+    
+    map = L.map('map').setView([miLatitud, miLongitud], 15);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+}
+
+
+let marker = L.marker([51.5, -0.09]).addTo(map);
+marker.bindPopup("<b>Aca ando</b><br>I am a popup.").openPopup();
+*/

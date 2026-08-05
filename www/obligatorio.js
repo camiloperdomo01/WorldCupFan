@@ -637,7 +637,18 @@ function eliminarJugador(idJugador) {
         .then(function (informacion) {
             console.log(informacion);
 
-            previaListadoJugadores(); // para actualizar el listado luego de eliminar
+            if (informacion.codigo >= 200 && informacion.codigo < 300) {
+                mostrarMensaje(
+                    "SUCCESS",
+                    "Éxito",
+                    "Jugador eliminado correctamente.",
+                    3000,
+                );
+
+                previaListadoJugadores();
+            } else {
+                mostrarMensaje("ERROR", "Error", informacion.mensaje, 3000);
+            }
         })
 
         .catch(function (error) {
@@ -774,49 +785,38 @@ function previaMapa() {
         .then(function (informacion) {
             listaUsuariosPais = informacion.paises;
 
-            navigator.geolocation.getCurrentPosition(miUbicacion);
+            armarMapa(listaUsuariosPais);
         })
         .catch(function (error) {
             console.log(error);
         });
 }
 
-function miUbicacion(position) {
-    miLatitud = position.coords.latitude;
-    miLongitud = position.coords.longitude;
-
-    armarMapa(listaUsuariosPais);
-}
-
-function armarMapa(listaUsuariosPorPais) {
-    // para que se evite crear el mapa mas de una vez
-    if (map != null) {
+function armarMapa(listaUsuariosPais) {
+    if (map != undefined) {
         map.remove();
     }
 
-    // Centrar el mapa en donde estoy
-    map = L.map("map").setView([miLatitud, miLongitud], 15);
+    // centro aprox
+    map = L.map("map").setView([-23, -60], 4);
 
     L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 17,
         attribution: "&copy; OpenStreetMap",
     }).addTo(map);
 
-    // Recorre todos los países
     for (let pais of listaPaises) {
-        let cantidadUsuarios = 0;
+        let cantidad = 0;
 
-        // este for buscara la cantidad de usuarios de ese pais
-        for (let dato of listaUsuariosPorPais) {
-            if (pais.id == dato.id) {
-                cantidadUsuarios = dato.cantidadDeUsuarios;
+        for (let usuariosPais of listaUsuariosPais) {
+            if (usuariosPais.id == pais.id) {
+                cantidad = usuariosPais.cantidadDeUsuarios;
             }
         }
 
-        // variable para crear el marcador en el mapa 
-        let marker = L.marker([pais.latitud, pais.longitud]).addTo(map);
-
-        marker.bindTooltip(`${pais.nombre}<br>Usuarios: ${cantidadUsuarios}`);
+        L.marker([pais.latitud, pais.longitud])
+            .addTo(map)
+            .bindTooltip(`${pais.nombre}<br>Usuarios: ${cantidad}`);
     }
 }
 
@@ -834,28 +834,3 @@ function mostrarBienvenida() {
     }
 }
 
-/*
-function inicio(){
-    navigator.geolocation.getCurrentPosition(miUbicacion)
-}
-function miUbicacion(position){
-    console.log(position)
-    miLatitud= position.coords.latitude 
-    miLongitud= position.coords.longitude
-    console.log(miLatitud)
-    console.log(miLongitud)
-    armarMapa()
-}
-function armarMapa(){
-    
-    map = L.map('map').setView([miLatitud, miLongitud], 15);
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 17,
-    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-}).addTo(map);
-}
-
-
-let marker = L.marker([51.5, -0.09]).addTo(map);
-marker.bindPopup("<b>Aca ando</b><br>I am a popup.").openPopup();
-*/
